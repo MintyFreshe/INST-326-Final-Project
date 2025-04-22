@@ -17,7 +17,7 @@ def save_transactions(data):
     """
     pass
 
-def add_transaction(date, amount, category, description, type_):
+def add_transaction(date, amount, category, description, type):
     """Add a new transaction to the CSV file.
 
     Args:
@@ -25,7 +25,7 @@ def add_transaction(date, amount, category, description, type_):
         amount (float): Amount of the transaction.
         category (str): Category label.
         description (str): Short description.
-        type_ (str): Transaction type ('income' or 'expense').
+        type (str): Transaction type ('income' or 'expense').
     """
     pass
 
@@ -50,7 +50,7 @@ def delete_transaction(transaction_id):
     """
     pass
 
-def update_transaction(transaction_id, date, amount, category, description, type_):
+def update_transaction(transaction_id, date, amount, category, description, type):
     """Update an existing transaction by ID.
 
     Args:
@@ -59,6 +59,6 @@ def update_transaction(transaction_id, date, amount, category, description, type
         amount (float): New amount.
         category (str): New category.
         description (str): New description.
-        type_ (str): New type ('income' or 'expense').
+        type (str): New type ('income' or 'expense').
     """
     pass
