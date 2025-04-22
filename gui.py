@@ -2,6 +2,10 @@ import tkinter as tk
 from tkinter import *
 
 def gui():
+    """
+    Initializes the main GUI window for the budget application.
+    Creates input fields and a submit button to collect user data.
+    """
     root = tk.Tk()
     root.title("My Budget App")
     root.geometry("500x300")
@@ -17,7 +21,10 @@ def gui():
         
         data = processEntry(entries)
         
-        
+    
+    #some sort of validation to check if the data is valid before processing it into dictionary
+
+
 
     
     submit_button = Button(root, text="Submit", command=on_submit)
@@ -26,7 +33,18 @@ def gui():
 
     root.mainloop()
 
+
 def makeform(root, fields):
+    """
+    Creates a form with labeled input fields.
+
+    Args:
+        root (Tk): The root window where the form will be added.
+        fields (list): A list of field names to create labels and entry widgets.
+
+    Returns:
+        list: A list of tuples containing field names and their corresponding entry widgets.
+    """
     entries = []
     for field in fields:
         row = Frame(root)
@@ -43,7 +61,16 @@ def makeform(root, fields):
 
 
 def processEntry(entries):
-    
+    """
+    Processes the data entered in the form fields.
+
+    Args:
+        entries (list): A list of tuples containing field names and their corresponding entry widgets.
+
+    Returns:
+        dict: A dictionary where keys are field names and values are the entered data. ?? or a dictionary of lists where the 
+        keys are the usernames and the values are lists of their corresponding data.
+    """
     infoDict = {}
     
     for entry in entries:
@@ -56,13 +83,31 @@ def processEntry(entries):
             
         infoDict[name] = text
     
-    
     return infoDict
 
+
+
+def displayData(data):
+    """
+    
+    Displays the processed data in a new window or updates the existing GUI.
+
+    Args:
+        data (dict): The data to be displayed.
+    
+    """
+    
+    #use regex to search dictionary for the name of the user and display their data in a new window
+    # or update the existing GUI with the new data
+    
+    
+    pass
 
 
 
 
 if __name__ == "__main__":
-    
+    """
+    Entry point of the program. Launches the GUI.
+    """
     gui()
