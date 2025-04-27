@@ -1,113 +1,117 @@
 import tkinter as tk
 from tkinter import *
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-def gui():
+class Gui:
     """
     Initializes the main GUI window for the budget application.
     Creates input fields and a submit button to collect user data.
     """
-    root = tk.Tk()
-    root.title("My Budget App")
-    root.geometry("500x300")
 
-    # Define fields
-    fields = ['Name', 'Budget', 'Field 3']
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("My Budget App")
+        self.root.geometry("1000x800")
 
-    # Create form
-    entries = makeform(root, fields)
+        # Define fields
+        self.fields = ['Name', 'Budget', 'Field 3']
 
-    # Submit button
-    def on_submit():
+        # Create form
+        self.entries = self.makeform(self.fields)
+
+        # Submit button
+        submit_button = Button(self.root, text="Submit", command=self.on_submit)
+        submit_button.pack(side=LEFT, padx=100, pady=15)
+
+        self.pie_chart()
+
+        self.root.mainloop()
+
+    def makeform(self, fields):
+        """
+        Creates a form with labeled input fields.
+
+        Args:
+            fields (list): A list of field names to create labels and entry widgets.
+
+        Returns:
+            list: A list of tuples containing field names and their corresponding entry widgets.
+        """
+        entries = []
+        for field in fields:
+            row = Frame(self.root)
+            lab = Label(row, width=10, text=field, anchor='w')
+            ent = Entry(row, width=20)  # Adjust the width here
+            row.pack(side=TOP, fill=X, padx=5, pady=5)
+            lab.pack(side=LEFT)
+            ent.pack(side=LEFT, expand=FALSE, fill=X)
+            entries.append((field, ent))
+
+        print(entries)
+        return entries
+
+    def process_entry(self):
+        """
+        Processes the data entered in the form fields.
+
+        Returns:
+            dict: A dictionary where keys are field names and values are the entered data.
+        """
+        info_dict = {}
+        for entry in self.entries:
+            name = entry[0]  # grabs first element of tuple, which is the field name
+            text = entry[1].get()  # gets the text from the entry widget
+            info_dict[name] = text
+        return info_dict
+
+    def display_data(self, data):
+        """
+        Displays the processed data in a new window or updates the existing GUI.
+
+        Args:
+            data (dict): The data to be displayed.
+        """
+        # Example implementation to display data in a new window
+        new_window = tk.Toplevel(self.root)
+        new_window.title("Processed Data")
         
-        data = processEntry(entries)
+        for key, value in data.items():
+            label = Label(new_window, text=f"{key}: {value}")
+            label.pack()
+
+    def on_submit(self):
+        """
+        Handles the submit button click event.
+        """
+        data = self.process_entry()
+        self.display_data(data)
+
+    def pie_chart(self):
+        """
         
-    
-    #some sort of validation to check if the data is valid before processing it into dictionary
-
-
-
-    
-    submit_button = Button(root, text="Submit", command=on_submit)
-    
-    submit_button.pack(pady=10)
-
-    root.mainloop()
-
-
-def makeform(root, fields):
-    """
-    Creates a form with labeled input fields.
-
-    Args:
-        root (Tk): The root window where the form will be added.
-        fields (list): A list of field names to create labels and entry widgets.
-
-    Returns:
-        list: A list of tuples containing field names and their corresponding entry widgets.
-    """
-    entries = []
-    for field in fields:
-        row = Frame(root)
-        lab = Label(row, width=20, text=field, anchor='w')
-        ent = Entry(row)
-        row.pack(side=TOP, fill=X, padx=5, pady=5)
-        lab.pack(side=LEFT)
-        ent.pack(side=RIGHT, expand=YES, fill=X)
-        entries.append((field, ent))
-    
-    print(entries)
-    return entries
-
-
-
-def processEntry(entries):
-    """
-    Processes the data entered in the form fields.
-
-    Args:
-        entries (list): A list of tuples containing field names and their corresponding entry widgets.
-
-    Returns:
-        dict: A dictionary where keys are field names and values are the entered data. ?? or a dictionary of lists where the 
-        keys are the usernames and the values are lists of their corresponding data.
-    """
-    infoDict = {}
-    
-    for entry in entries:
-
-        name = entry[0] # grabs first element of tuple, which is the user name
+        Placeholder for pie chart functionality.
+        """
         
-        text = []
+        self.labels = 'Frogs', 'Hogs', 'Dogs', 'Logs'
+        
+        self.sizes = [15, 30, 45, 10]
 
-        #text = entry[1].get()
-            
-        infoDict[name] = text
-    
-    return infoDict
-
-
-
-def displayData(data):
-    """
-    
-    Displays the processed data in a new window or updates the existing GUI.
-
-    Args:
-        data (dict): The data to be displayed.
-    
-    """
-    
-    #use regex to search dictionary for the name of the user and display their data in a new window
-    # or update the existing GUI with the new data
-    
-    
-    pass
-
-
-
+        fig, ax = plt.subplots()
+        
+        ax.pie(self.sizes, labels=self.labels, textprops={'size': 'smaller'}, radius=1.2, startangle=90, autopct='%1.1f%%', shadow=True, explode=(0.1, 0.1, 0.1, 0.1))
+        
+        
+        canvas = FigureCanvasTkAgg(fig, master=self.root)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=RIGHT, fill=BOTH, expand=True)
+        
+        
+        
+       
 
 if __name__ == "__main__":
     """
     Entry point of the program. Launches the GUI.
     """
-    gui()
+    Gui()
