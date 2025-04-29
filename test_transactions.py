@@ -12,58 +12,67 @@ from transactions import (
 class TestTransactionCSV(unittest.TestCase):
 
     def setUp(self):
-        """Set up test data before each test runs
+        """Set up sample data before each test"""
 
-        This ensures that each test starts with a known state — two transactions in the CSV file
-        """
-    
-        self.test_data = [
+        self.initial_data = [
             {"id": 1, "date": "2025-01-01", "amount": 100.0, "category": "Food", "description": "Groceries", "type": "expense"},
-            {"id": 2, "date": "2025-01-02", "amount": 300.0, "category": "Salary", "description": "Monthly pay", "type": "income"},
+            {"id": 2, "date": "2025-01-02", "amount": 200.0, "category": "Salary", "description": "Job income", "type": "income"},
+            {"id": 3, "date": "2025-01-03", "amount": 50.0, "category": "Transport", "description": "Bus fare", "type": "expense"}
         ]
-        save_transactions(self.test_data)
+
+        save_transactions(self.initial_data)
 
     def tearDown(self):
-        """Clean up after each test by deleting the CSV file to avoid interference between tests
+        """Clean up after each test"""
 
-        """
         if os.path.exists("transactions.csv"):
+
             os.remove("transactions.csv")
 
-    def test_add_transaction(self):
-        """Test that a new transaction is added correctly to the CSV file
+    def test_load_transactions(self):
 
-        - Adds a transport expense
-        - Checks that the total number of transactions is now 3
-        - Verifies that the last added transaction is categorized correctly
-        """
-        add_transaction("2025-01-03", 50, "Transport", "Bus", "expense")
         transactions = load_transactions()
         self.assertEqual(len(transactions), 3)
-        self.assertEqual(transactions[-1]["category"], "Transport")
+        self.assertEqual(transactions[0]["category"], "Food")
+
+    def test_add_transaction(self):
+
+        add_transaction("2025-01-04", 75.0, "Utilities", "Electric bill", "expense")
+        transactions = load_transactions()
+        self.assertEqual(len(transactions), 4)
+        self.assertEqual(transactions[-1]["description"], "Electric bill")
 
     def test_delete_transaction(self):
-        """Test that a transaction can be deleted by its ID
 
-        - Deletes the transaction with ID 1
-        - Verifies that only one transaction remains.
-        - Checks that the remaining transaction has ID 2
-        """
-        delete_transaction(1)
+        delete_transaction(2)
         transactions = load_transactions()
-        self.assertEqual(len(transactions), 1)
-        self.assertEqual(transactions[0]["id"], 2)
+        self.assertEqual(len(transactions), 2)
+        self.assertNotIn(2, [t["id"] for t in transactions])
 
     def test_update_transaction(self):
-        """Test that a transaction can be updated correctly
 
-        - Updates the transaction with ID 2
-        - Verifies that the amount and description fields have been modified
-        """
-        update_transaction(2, "2025-01-02", 350, "Salary", "Updated pay", "income")
-        updated = [t for t in load_transactions() if t["id"] == 2][0]
-        self.assertEqual(updated["amount"], 350)
-        self.assertEqual(updated["description"], "Updated pay")
+        update_transaction(1, "2025-01-10", 150.0, "Food", "Updated groceries", "expense")
+        updated = [t for t in load_transactions() if t["id"] == 1][0]
+        self.assertEqual(updated["amount"], 150.0)
+        self.assertEqual(updated["description"], "Updated groceries")
+
+    def test_get_transactions_date_filter(self):
+
+        results = get_transactions(start_date="2025-01-02", end_date="2025-01-03")
+        self.assertEqual(len(results), 2)
+        self.assertTrue(all(r["date"] >= "2025-01-02" and r["date"] <= "2025-01-03" for r in results))
+
+    def test_get_transactions_category_filter(self):
+
+        results = get_transactions(category="Transport")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["description"], "Bus fare")
+
+    def test_get_transactions_combined_filters(self):
+        
+        results = get_transactions(start_date="2025-01-01", end_date="2025-01-03", category="Food")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["category"], "Food")
 
 if __name__ == '__main__':
     unittest.main()
