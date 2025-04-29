@@ -7,7 +7,26 @@ def load_transactions():
     Returns:
         list[dict]: A list of transactions as dictionaries
     """
-    pass
+    transactions = []
+    if os.path.exists(CSV_FILE):
+
+        with open(CSV_FILE, mode='r', newline='') as file:
+
+            reader = csv.DictReader(file)
+            for row in reader:
+                
+                try:
+
+                    row["id"] = int(row["id"])
+                    row["amount"] = float(row["amount"])
+
+                except ValueError:
+
+                    continue  #skips bad row
+
+                transactions.append(row)
+
+    return transactions
 
 def save_transactions(data):
     """Save a list of transaction dictionaries to the CSV file
@@ -15,9 +34,16 @@ def save_transactions(data):
     Args:
         data (list[dict]): Transactions to write to file
     """
-    pass
+    with open(CSV_FILE, mode='w', newline='') as file:
 
-def add_transaction(date, amount, category, description, type):
+        writer = csv.DictWriter(file, fieldnames=FIELDNAMES)
+        writer.writeheader()
+        for row in data:
+
+            row_str = {key: str(row[key]) for key in FIELDNAMES}
+            writer.writerow(row_str)
+
+def add_transaction(date, amount, category, description, txn_type):
     """Add a new transaction to the CSV file
 
     Args:
@@ -25,9 +51,22 @@ def add_transaction(date, amount, category, description, type):
         amount (float): Amount of the transaction
         category (str): Category label
         description (str): Short description
-        type (str): Transaction type ('income' or 'expense')
+        txn_type (str): Transaction type ('income' or 'expense')
     """
-    pass
+    transactions = load_transactions()
+    next_id = max([t["id"] for t in transactions], default=0) + 1
+
+    new_transaction = {
+        "id": next_id,
+        "date": date,
+        "amount": float(amount),
+        "category": category,
+        "description": description,
+        "type": txn_type
+    }
+
+    transactions.append(new_transaction)
+    save_transactions(transactions)
 
 def get_transactions(start_date=None, end_date=None, category=None):
     """Retrieve transactions filtered by date or category
@@ -40,7 +79,25 @@ def get_transactions(start_date=None, end_date=None, category=None):
     Returns:
         list[dict]: Matching transactions
     """
-    pass
+    transactions = load_transactions()
+    filtered = []
+    for t in transactions:
+
+        if start_date and t["date"] < start_date:
+
+            continue
+
+        if end_date and t["date"] > end_date:
+
+            continue
+
+        if category and t["category"].lower() != category.lower():
+
+            continue
+
+        filtered.append(t)
+
+    return filtered
 
 def delete_transaction(transaction_id):
     """Delete a transaction by ID
@@ -48,9 +105,11 @@ def delete_transaction(transaction_id):
     Args:
         transaction_id (int): The transaction ID to delete
     """
-    pass
+    transactions = load_transactions()
+    updated = [t for t in transactions if t["id"] != transaction_id]
+    save_transactions(updated)
 
-def update_transaction(transaction_id, date, amount, category, description, type):
+def update_transaction(transaction_id, date, amount, category, description, txn_type):
     """Update an existing transaction by ID
 
     Args:
@@ -59,6 +118,22 @@ def update_transaction(transaction_id, date, amount, category, description, type
         amount (float): New amount
         category (str): New category
         description (str): New description
-        type (str): New type ('income' or 'expense')
+        txn_type (str): New type ('income' or 'expense')
     """
-    pass
+    transactions = load_transactions()
+    for t in transactions:
+
+        if t["id"] == transaction_id:
+
+            t["date"] = date
+            t["amount"] = float(amount)
+            t["category"] = category
+            t["description"] = description
+            t["type"] = txn_type
+            break
+
+        else:
+
+            raise ValueError(f"Transaction with ID {transaction_id} not found.")
+
+    save_transactions(transactions)
