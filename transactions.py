@@ -1,6 +1,9 @@
 import csv
 import os
 
+CSV_FILE = "transactions.csv"
+FIELDNAMES = ["id", "date", "amount", "category", "description", "type"]
+
 def load_transactions():
     """Load all transactions from the CSV file
 
