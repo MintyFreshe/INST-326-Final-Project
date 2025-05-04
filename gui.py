@@ -14,14 +14,18 @@ class Gui:
         self.root.title("My Budget App")
         self.root.geometry("1000x800")
 
+        
+        #Ensure proper closure of the window
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+        
         # Define fields
-        self.fields = ['Name', 'Budget', 'Field 3']
+        self.fields = ['Name', 'Budget', 'Food', 'Transport', 'Housing', 'Entertainment', 'Savings', 'Miscellaneous']
 
         # Create form
         self.entries = self.makeform(self.fields)
 
         # Submit button
-        submit_button = Button(self.root, text="Submit", command=self.on_submit)
+        submit_button = Button(self.root, text="Submit", command=self.on_submit) #<-- Calls the on_submit function when clicked
         submit_button.pack(side=LEFT, padx=100, pady=15)
 
         self.pie_chart()
@@ -63,7 +67,8 @@ class Gui:
             name = entry[0]  # grabs first element of tuple, which is the field name
             text = entry[1].get()  # gets the text from the entry widget
             info_dict[name] = text
-        return info_dict
+        
+        return info_dict #<-- Holds the data entered in the form fields
 
     def display_data(self, data):
         """
@@ -83,6 +88,8 @@ class Gui:
     def on_submit(self):
         """
         Handles the submit button click event.
+        changes the data in the Pie chart based off the data entered in the form fields.
+        
         """
         data = self.process_entry()
         self.display_data(data)
@@ -93,9 +100,9 @@ class Gui:
         Placeholder for pie chart functionality.
         """
         
-        self.labels = 'Frogs', 'Hogs', 'Dogs', 'Logs'
+        self.labels = 'Frogs', 'Hogs', 'Dogs', 'Logs' #
         
-        self.sizes = [15, 30, 45, 10]
+        self.sizes = [15, 30, 45, 10] #<-- Placeholder data - calculate % each part of total budget and replace
 
         fig, ax = plt.subplots()
         
@@ -104,10 +111,15 @@ class Gui:
         
         canvas = FigureCanvasTkAgg(fig, master=self.root)
         canvas.draw()
-        canvas.get_tk_widget().pack(side=RIGHT, fill=BOTH, expand=True)
+        canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=False)
         
         
-        
+    def on_close(self):
+        """
+        Handles the window close event.
+        """
+        self.root.destroy()  # Destroys the Tkinter window
+        exit()  # Terminates the program
        
 
 if __name__ == "__main__":
