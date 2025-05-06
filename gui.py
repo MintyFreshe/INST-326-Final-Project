@@ -94,15 +94,17 @@ class MainGui:
         data = self.process_entry()
         self.display_data(data)
 
-    def pie_chart(self):
+    def pie_chart(self, data:tuple): #parameter holds calcualted data from the form fields
         """
-        
+        param data : tuple, = Holds the calculated data from the form fields.
+
         Placeholder for pie chart functionality.
         """
-        
+    
+
         self.labels = 'Frogs', 'Hogs', 'Dogs', 'Logs' #
         
-        self.sizes = [15, 30, 45, 10] #<-- Placeholder data - calculate % each part of total budget and replace
+        self.sizes = [data[0], data[1], data[2], data[3]] #<-- tuple holding calculations for budget %
 
         fig, ax = plt.subplots()
         
