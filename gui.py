@@ -3,7 +3,7 @@ from tkinter import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-class Gui:
+class MainGui:
     """
     Initializes the main GUI window for the budget application.
     Creates input fields and a submit button to collect user data.
@@ -126,4 +126,4 @@ if __name__ == "__main__":
     """
     Entry point of the program. Launches the GUI.
     """
-    Gui()
+    MainGui()
