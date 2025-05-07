@@ -1,0 +1,6 @@
+id,transaction_name,date,income_expense,amount,essential
+1,Groceries,2025-01-01,expense,100.0,yes
+2,Salary,2025-01-02,income,2000.0,no
+3,Bus Pass,2025-01-03,expense,50.0,yes
+4,Bonus,2025-01-05,income,500.0,no
+5,Coffee,2025-01-06,expense,4.5,no
