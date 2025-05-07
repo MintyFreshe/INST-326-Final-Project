@@ -2,10 +2,11 @@ import csv
 import os
 
 class TransactionManager():
-    
+
     def __init__(self, csv_file="transactions.csv"):
+
         self.csv_file = csv_file
-        self.fieldnames = ["id", "date", "amount", "category", "description", "type"]
+        self.fieldnames = ["id", "transaction_name", "date", "income_expense", "amount", "essential"]
 
     def load_transactions(self):
         """Load all transactions from the CSV file
@@ -20,7 +21,7 @@ class TransactionManager():
 
                 reader = csv.DictReader(file)
                 for row in reader:
-                
+
                     try:
 
                         row["id"] = int(row["id"])
@@ -28,7 +29,7 @@ class TransactionManager():
 
                     except ValueError:
 
-                        continue  #skips bad row
+                        continue  # skips bad row
 
                     transactions.append(row)
 
@@ -49,26 +50,26 @@ class TransactionManager():
                 row_str = {key: str(row[key]) for key in self.fieldnames}
                 writer.writerow(row_str)
 
-    def add_transaction(self, date, amount, category, description, txn_type):
+    def add_transaction(self, transaction_name, date, income_expense, amount, essential):
         """Add a new transaction to the CSV file
 
         Args:
+            transaction_name (str): Name/label for the transaction
             date (str): Transaction date (YYYY-MM-DD)
-            amount (float): Amount of the transaction
-            category (str): Category label
-            description (str): Short description
-            txn_type (str): Transaction type ('income' or 'expense')
+            income_expense (str): 'income' or 'expense'
+            amount (float): Transaction amount
+            essential (str): 'yes' or 'no'
         """
         transactions = self.load_transactions()
         next_id = max([t["id"] for t in transactions], default=0) + 1
 
         new_transaction = {
             "id": next_id,
+            "transaction_name": transaction_name,
             "date": date,
+            "income_expense": income_expense,
             "amount": float(amount),
-            "category": category,
-            "description": description,
-            "type": txn_type
+            "essential": essential
         }
 
         transactions.append(new_transaction)
@@ -80,7 +81,7 @@ class TransactionManager():
         Args:
             start_date (str, optional): Earliest date to include
             end_date (str, optional): Latest date to include
-            category (str, optional): Category to filter
+            category (str, optional): Category (income/expense) to filter
 
         Returns:
             list[dict]: Matching transactions
@@ -90,15 +91,12 @@ class TransactionManager():
         for t in transactions:
 
             if start_date and t["date"] < start_date:
-
                 continue
 
             if end_date and t["date"] > end_date:
-
                 continue
 
-            if category and t["category"].lower() != category.lower():
-
+            if category and t["income_expense"].lower() != category.lower():
                 continue
 
             filtered.append(t)
@@ -115,32 +113,34 @@ class TransactionManager():
         updated = [t for t in transactions if t["id"] != transaction_id]
         self.save_transactions(updated)
 
-    def update_transaction(self, transaction_id, date, amount, category, description, txn_type):
+    def update_transaction(self, transaction_id, transaction_name, date, income_expense, amount, essential):
         """Update an existing transaction by ID
 
         Args:
             transaction_id (int): ID of transaction to update
+            transaction_name (str): New transaction name
             date (str): New date
+            income_expense (str): New type ('income' or 'expense')
             amount (float): New amount
-            category (str): New category
-            description (str): New description
-            txn_type (str): New type ('income' or 'expense')
+            essential (str): 'yes' or 'no'
         """
         transactions = self.load_transactions()
+        found = False
         for t in transactions:
 
             if t["id"] == transaction_id:
-
+                t["transaction_name"] = transaction_name
                 t["date"] = date
+                t["income_expense"] = income_expense
                 t["amount"] = float(amount)
-                t["category"] = category
-                t["description"] = description
-                t["type"] = txn_type
+                t["essential"] = essential
+                found = True
                 break
 
-            else:
+        if not found:
 
-                raise ValueError(f"Transaction with ID {transaction_id} not found.")
-
+            raise ValueError(f"Transaction with ID {transaction_id} not found.")
+        
         self.save_transactions(transactions)
+
 
