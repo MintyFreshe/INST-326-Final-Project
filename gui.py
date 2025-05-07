@@ -77,7 +77,7 @@ class MainGui:
         Args:
             data (dict): The data to be displayed.
         """
-        # Example implementation to display data in a new window
+        # Example implementation to display data in a new window <--------------unused window for testing purposes
         new_window = tk.Toplevel(self.root)
         new_window.title("Processed Data")
         
@@ -91,10 +91,16 @@ class MainGui:
         changes the data in the Pie chart based off the data entered in the form fields.
         
         """
+        
         data = self.process_entry()
-        self.display_data(data)
+        print(data) #<-- prints the data entered in the form fields to the console for testing purposes
+        
+        return data #<--- returns the data entered in form fields to be accessed in main.py   
 
-    def pie_chart(self, data:tuple): #parameter holds calcualted data from the form fields
+
+        #self.display_data(data)
+
+    def pie_chart(self): #data:tuple): #parameter holds calcualted data from the form fields
         """
         param data : tuple, = Holds the calculated data from the form fields.
 
@@ -104,7 +110,7 @@ class MainGui:
 
         self.labels = 'Frogs', 'Hogs', 'Dogs', 'Logs' #
         
-        self.sizes = [data[0], data[1], data[2], data[3]] #<-- tuple holding calculations for budget %
+        self.sizes = [15, 70, 5, 10]                           #[data[0], data[1], data[2], data[3]] #<-- tuple holding calculations for budget %
 
         fig, ax = plt.subplots()
         
