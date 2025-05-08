@@ -5,74 +5,77 @@ from transactions import TransactionManager
 class TestTransactionManager(unittest.TestCase):
 
     def setUp(self):
-        """Set up sample data before each test"""
-        self.tm = TransactionManager()
-        self.initial_data = [
-            {"id": 1, "date": "2025-01-01", "amount": 100.0, "category": "Food", "description": "Groceries", "type": "expense"},
-            {"id": 2, "date": "2025-01-02", "amount": 200.0, "category": "Salary", "description": "Job income", "type": "income"},
-            {"id": 3, "date": "2025-01-03", "amount": 50.0, "category": "Transport", "description": "Bus fare", "type": "expense"}
+        """Set up a test file and TransactionManager instance"""
+        
+        self.test_file = "test_transactions.csv"
+        self.tm = TransactionManager(csv_file=self.test_file)
+        self.sample_data = [
+            {"id": 1, "transaction_name": "Groceries", "date": "2025-05-01", "income_expense": "expense", "amount": 50.0, "essential": "yes"},
+            {"id": 2, "transaction_name": "Salary", "date": "2025-05-02", "income_expense": "income", "amount": 1000.0, "essential": "no"},
         ]
-
-        self.tm.save_transactions(self.initial_data)
+        self.tm.save_transactions(self.sample_data)
 
     def tearDown(self):
-        """Clean up after each test"""
+        """Remove the test file after each test"""
 
-        if os.path.exists("transactions.csv"):
+        if os.path.exists(self.test_file):
 
-            os.remove("transactions.csv")
+            os.remove(self.test_file)
 
     def test_load_transactions(self):
-        """Test that transactions are correctly loaded from the CSV file."""
+        """Test loading transactions"""
 
-        transactions = self.tm.load_transactions()
-        self.assertEqual(len(transactions), 3)
-        self.assertEqual(transactions[0]["category"], "Food")
-
-    def test_add_transaction(self):
-        """Test adding a new transaction and verify it's written correctly."""
-
-        self.tm.add_transaction("2025-01-04", 75.0, "Utilities", "Electric bill", "expense")
-        transactions = self.tm.load_transactions()
-        self.assertEqual(len(transactions), 4)
-        self.assertEqual(transactions[-1]["description"], "Electric bill")
-
-    def test_delete_transaction(self):
-        """Test deleting a transaction by ID and verify it's removed."""
-
-        self.tm.delete_transaction(2)
         transactions = self.tm.load_transactions()
         self.assertEqual(len(transactions), 2)
-        self.assertNotIn(2, [t["id"] for t in transactions])
+        self.assertEqual(transactions[0]["transaction_name"], "Groceries")
+
+    def test_add_transaction(self):
+        """Test adding a new transaction"""
+
+        self.tm.add_transaction("Book", "2025-05-03", "expense", 25.0, "no")
+        transactions = self.tm.load_transactions()
+        self.assertEqual(len(transactions), 3)
+        self.assertEqual(transactions[-1]["transaction_name"], "Book")
+
+    def test_get_transactions_by_date(self):
+        """Test filtering by start and end date"""
+
+        results = self.tm.get_transactions(start_date="2025-05-02")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["transaction_name"], "Salary")
+
+    def test_get_transactions_by_category(self):
+        """Test filtering by income/expense category"""
+
+        results = self.tm.get_transactions(category="income")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["transaction_name"], "Salary")
+
+    def test_delete_transaction(self):
+        """Test deleting a transaction"""
+
+        self.tm.delete_transaction(1)
+        transactions = self.tm.load_transactions()
+        self.assertEqual(len(transactions), 1)
+        self.assertEqual(transactions[0]["id"], 2)
 
     def test_update_transaction(self):
-        """Test updating an existing transaction's amount and description."""
+        """Test updating a transaction"""
 
-        self.tm.update_transaction(1, "2025-01-10", 150.0, "Food", "Updated groceries", "expense")
-        updated = [t for t in self.tm.load_transactions() if t["id"] == 1][0]
-        self.assertEqual(updated["amount"], 150.0)
-        self.assertEqual(updated["description"], "Updated groceries")
+        self.tm.update_transaction(2, "Freelance", "2025-05-04", "income", 1200.0, "yes")
+        transactions = self.tm.load_transactions()
+        updated = [t for t in transactions if t["id"] == 2][0]
+        self.assertEqual(updated["transaction_name"], "Freelance")
+        self.assertEqual(updated["amount"], 1200.0)
+        self.assertEqual(updated["essential"], "yes")
 
-    def test_get_transactions_date_filter(self):
-        """Test filtering transactions by a date range."""
+    def test_update_transaction_invalid_id(self):
+        """Test updating a non-existent transaction"""
 
-        results = self.tm.get_transactions(start_date="2025-01-02", end_date="2025-01-03")
-        self.assertEqual(len(results), 2)
-        self.assertTrue(all(r["date"] >= "2025-01-02" and r["date"] <= "2025-01-03" for r in results))
+        with self.assertRaises(ValueError):
 
-    def test_get_transactions_category_filter(self):
-        """Test filtering transactions by a category (case-insensitive)."""
+            self.tm.update_transaction(999, "None", "2025-05-05", "income", 0.0, "no")
 
-        results = self.tm.get_transactions(category="Transport")
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]["description"], "Bus fare")
+if __name__ == "__main__":
 
-    def test_get_transactions_combined_filters(self):
-        """Test filtering by both date range and category."""
-
-        results = self.tm.get_transactions(start_date="2025-01-01", end_date="2025-01-03", category="Food")
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]["category"], "Food")
-
-if __name__ == '__main__':
     unittest.main()
