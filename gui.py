@@ -12,12 +12,12 @@ class MainGui:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("My Budget App")
-        self.root.geometry("1000x800")
+        self.root.geometry("1200x600")
 
-        
-        #Ensure proper closure of the window
-        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
-        
+        #frames for feilds 
+        self.input_frame = tk.LabelFrame(self.root, text="Budget Inputs")
+        self.input_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
+
         # Define fields
         self.fields = ['Name', 'Budget', 'Food', 'Transport', 'Housing', 'Entertainment', 'Savings', 'Miscellaneous']
 
@@ -25,11 +25,24 @@ class MainGui:
         self.entries = self.makeform(self.fields)
 
         # Submit button
-        submit_button = Button(self.root, text="Submit", command=self.on_submit) #<-- Calls the on_submit function when clicked
-        submit_button.pack(side=LEFT, padx=100, pady=15)
+        submit_button = Button(self.input_frame, text="Submit", command=self.on_submit) # Calls the on_submit function when clicked
+        submit_button.grid(row=len(self.fields), column=0, columnspan=2, padx=15, pady=15)
 
-        self.pie_chart()
+        self.charts_frame = tk.Frame(self.root) #new frame for charts
+        self.charts_frame.grid(row=0, column=1, padx=2, pady=2) #orginizing...
+        self.root.columnconfigure(1, weight=1) 
+        self.root.rowconfigure(0, weight=1)
 
+        #to hold each chart
+        self.chart1_canvas = None 
+        self.chart2_canvas = None
+        self.chart3_canvas = None
+
+        #Ensure proper closure of the window
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+
+
+        self.create_charts()
         self.root.mainloop()
 
     def makeform(self, fields):
@@ -43,15 +56,14 @@ class MainGui:
             list: A list of tuples containing field names and their corresponding entry widgets.
         """
         entries = []
-        for field in fields:
-            row = Frame(self.root)
-            lab = Label(row, width=10, text=field, anchor='w')
-            ent = Entry(row, width=20)  # Adjust the width here
-            row.pack(side=TOP, fill=X, padx=5, pady=5)
-            lab.pack(side=LEFT)
-            ent.pack(side=LEFT, expand=FALSE, fill=X)
-            entries.append((field, ent))
+        for i, field in  enumerate(fields):
+            lbl = tk.Label(self.input_frame, text=field + ":")
+            lbl.grid(row=i, column=0, sticky="e", pady=1)
 
+            ent = tk.Entry(self.input_frame ,width=20)
+            ent.grid(row=i, column=1, pady=2, sticky="w")
+
+            entries.append((field, ent))
         print(entries)
         return entries
 
@@ -83,44 +95,220 @@ class MainGui:
         
         for key, value in data.items():
             label = Label(new_window, text=f"{key}: {value}")
-            label.pack()
+            label.pack(padx=5, pady=5)
 
-    def on_submit(self):
+    def on_submit(self): 
         """
         Handles the submit button click event.
         changes the data in the Pie chart based off the data entered in the form fields.
         
         """
-        
         data = self.process_entry()
-        print(data) #<-- prints the data entered in the form fields to the console for testing purposes
+        print(data) #the data entered in the form fields to the console for testing purposes
         
-        return data #<--- returns the data entered in form fields to be accessed in main.py   
+        labels = [field for field in self.fields if field not in ["Name", "Budget"]] # we dont want these to show in the data
 
+        try:
+            sizes = [float(data[label]) for label in labels] #tries converting string input to floats
+        except ValueError:
+            sizes = [0.0] * len(labels)
 
-        #self.display_data(data)
+        return data #returns the data entered in form fields to be accessed in main.py   
+        #self.display_data(data) 
 
-    def pie_chart(self): #data:tuple): #parameter holds calcualted data from the form fields
+    def create_charts(self):
         """
-        param data : tuple, = Holds the calculated data from the form fields.
-
-        Placeholder for pie chart functionality.
+        Creates the initial charts with empty data.
         """
+        labels = []
+        sizes = []
+        
+        # Store data for resizing  --CHAT
+        self.chart_data = {
+            'labels': labels,
+            'sizes': sizes
+        }
+        
+        # Create empty charts if no data input (like on startup)
+        self.chart1_canvas = self.create_pie_chart(labels, sizes)
+        self.chart2_canvas = self.create_bar_chart(labels, sizes)
+        self.chart3_canvas = self.create_line_chart(labels, sizes)
+        
+        # Bind the window resize event -- chat assist
+        self.root.bind('<Configure>', self.handle_resize) #bind() connects configure to the handle resize,
+                                                          #<configure> is the event for resizing the window,
+                                                          #so when the window is resized, it calls the handle_resize method
+                                                          #and resizes the charts.
+        
+    def create_pie_chart(self, labels, sizes):
+        """
+        Creates a pie chart
+        """
+        total = sum(sizes)
+      
+        # Create chart frame
+        chart_frame = tk.Frame(self.charts_frame)
+        chart_frame.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+      
+        # Update the chart frame's grid weight to allow expansion -- CHAT assist
+        self.charts_frame.grid_columnconfigure(0, weight=1)
+        self.charts_frame.grid_rowconfigure(0, weight=1)
+      
+        # Create figure with dynamic sizing 
+        fig = plt.Figure(tight_layout=True) #CHAT assist 
+
+        ax = fig.add_subplot()
+      
+        if total > 0: #is there any data to plot
+           ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+        else:
+           #in the center write no data
+           ax.text(0.5, 0.5, "No data", ha='center', va='center')
+      
+        #title for the charts 
+        ax.set_title("Budget Distribution")
+      
+        # Create canvas with expansion enabled -- chat assist 
+        canvas = FigureCanvasTkAgg(fig, master=chart_frame)
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+      
+        # Make sure the figure reacts to canvas resize
+        fig.canvas.draw()
+        return canvas
+
+
+    def create_bar_chart(self, labels, sizes):
+        """
+        Creates a bar chart that will resize with its container.
+        """
+        # Create chart frame
+        chart_frame = tk.Frame(self.charts_frame)
+        chart_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
+        
+        # Update the chart frame's grid weight to allow expansion -- CHAT
+        self.charts_frame.grid_columnconfigure(1, weight=1)
+        self.charts_frame.grid_rowconfigure(0, weight=1)
+        
+        # Create figure with dynamic sizing
+        fig = plt.Figure(tight_layout=True) # -- CHAT
+
+        ax = fig.add_subplot()
+        
+        if sum(sizes) > 0: #non Zero data
+            ax.bar(range(len(labels)), sizes)
+            if labels:
+                ax.set_xticks(range(len(labels))) # organize the bars with the ticks - Chat assist
+                ax.set_xticklabels(labels, rotation=45, ha='right') #each tick gets the appropriate label
+        else:
+            ax.text(0.5, 0.5, "No data", ha='center', va='center') #no data tag
+        
+        ax.set_title("Budget Comparison")
+        
+        # Create canvas with expansion enabled -- CHAT 
+        canvas = FigureCanvasTkAgg(fig, master=chart_frame)
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+        
+        fig.canvas.draw() 
+        return canvas
+
+
+    def create_line_chart(self, labels, sizes):
+        """
+        Creates a line chart that will resize with its container.
+        """
+        # Create chart frame
+        chart_frame = tk.Frame(self.charts_frame)
+        chart_frame.grid(row=1, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
+        
+        # Update the chart frame's grid weight to allow expansion
+        self.charts_frame.grid_rowconfigure(1, weight=1)
+        
+        # Create figure with dynamic sizing
+        fig = plt.Figure(tight_layout=True) #--CHAT 
+        ax = fig.add_subplot()
+        
+        if sum(sizes) > 0: #if data 
+            ax.plot(range(len(labels)), sizes)
+
+            if labels:
+                ax.set_xticks(range(len(labels)))
+                ax.set_xticklabels(labels, rotation=45, ha='right')
+        else:
+            ax.text(0.5, 0.5, "No data", ha='center', va='center')
+        
+        ax.set_title("Budget Trend")
+        
+        # Create canvas with expansion enabled
+        canvas = FigureCanvasTkAgg(fig, master=chart_frame) #-- chat assist
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+        
+        # Make sure the figure reacts to canvas resize
+        fig.canvas.draw()
+        
+        return canvas
     
+    def handle_resize(self, event): #--CHAT
+       """
+       Handle window resize event and update charts if needed.
+       """
+       # Check if this is a window resize (not a widget internal event)
+       if event.widget == self.root:
+           # Cancel previous scheduled resize if it exists
+           if hasattr(self, '_resize_job') and self._resize_job: 
+               self.root.after_cancel(self._resize_job)
+          
+           # Schedule new resize with 200ms delay
+           self._resize_job = self.root.after(200, self.redraw_charts)
+    
+    def redraw_charts(self): #--chat assist
+        """
+        Redraw charts using current data and window size.
+        """
+        self._resize_job = None  # Clear the job 
+        
+        if hasattr(self, 'chart_data'):
+            self.update_charts(self.chart_data['labels'], self.chart_data['sizes'])
 
-        self.labels = 'Frogs', 'Hogs', 'Dogs', 'Logs' #
-        
-        self.sizes = [15, 70, 5, 10]                           #[data[0], data[1], data[2], data[3]] #<-- tuple holding calculations for budget %
 
-        fig, ax = plt.subplots()
+    def update_charts(self, labels, sizes):
+        """
+        Updates the charts with new data.
+        """
+        # Store the latest data
+        self.chart_data = {
+            'labels': labels,
+            'sizes': sizes
+        }
         
-        ax.pie(self.sizes, labels=self.labels, textprops={'size': 'smaller'}, radius=1.2, startangle=90, autopct='%1.1f%%', shadow=True, explode=(0.1, 0.1, 0.1, 0.1))
+        # destroy the old canvases to make space for new charts
+        if self.chart1_canvas:
+            self.chart1_canvas.get_tk_widget().destroy()
+        if self.chart2_canvas:
+            self.chart2_canvas.get_tk_widget().destroy()
+        if self.chart3_canvas:
+            self.chart3_canvas.get_tk_widget().destroy()
         
+        # update the charts
+        self.chart1_canvas = self.create_pie_chart(labels, sizes)
+        self.chart2_canvas = self.create_bar_chart(labels, sizes)
+        self.chart3_canvas = self.create_line_chart(labels, sizes)
+
+    def setup_charts_grid(self):
+        """
+        Setting up the grid layout to fit on screen properly 
+        """
+        # Configure main window for resizing
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_rowconfigure(0, weight=1)
         
-        canvas = FigureCanvasTkAgg(fig, master=self.root)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=False)
+        # Configure the charts frame for proper expansion
+        self.charts_frame.grid(sticky="nsew")
         
+        # Configure grid weights for the charts layout
+        self.charts_frame.grid_columnconfigure(0, weight=1)
+        self.charts_frame.grid_columnconfigure(1, weight=1)
+        self.charts_frame.grid_rowconfigure(0, weight=1)
+        self.charts_frame.grid_rowconfigure(1, weight=1)
         
     def on_close(self):
         """
