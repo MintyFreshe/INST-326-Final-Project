@@ -3,6 +3,18 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 from datetime import datetime
 
+
+
+
+def load_transactions_from_csv(filename="sample_transactions.csv"):
+    """
+    Load transactions from a CSV file and return a list of dictionaries.
+    Each row becomes a dictionary with string values.
+    """
+    with open(filename, newline="") as f:
+        reader = csv.DictReader(f)
+        return list(reader)
+
 def calculate_total_income(transactions):
     """
     Calculate the total income from a list of transactions.
@@ -181,3 +193,25 @@ def plot_stacked_expense_categories(transactions):
     plt.tight_layout()
     plt.legend(title="Category")
     plt.show()
+    
+    
+    
+    
+if __name__ == "__main__":
+    transactions = load_transactions_from_csv()
+
+    print("Total Income:", calculate_total_income(transactions))
+    print("Total Expenses:", calculate_total_expenses(transactions))
+    print("Net Balance:", calculate_balance(transactions))
+
+    print("\nMonthly Summary:")
+    for month, values in get_monthly_summary(transactions).items():
+        print(f"{month}: Income = ${values['income']:.2f}, Expenses = ${values['expense']:.2f}")
+
+    print("\nTop Expenses:")
+    for t in get_top_expenses(transactions):
+        print(f"{t['date']} - {t['transaction name']} - ${t['amount']}")
+
+    plot_expense_pie(transactions)
+    plot_cumulative_balance(transactions)
+    plot_stacked_expense_categories(transactions)
