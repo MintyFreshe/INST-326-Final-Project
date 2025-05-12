@@ -43,7 +43,7 @@ class MainGui:
 
 
         self.create_charts()
-        self.root.mainloop()
+        
 
     def makeform(self, fields):
         """
@@ -322,4 +322,7 @@ if __name__ == "__main__":
     """
     Entry point of the program. Launches the GUI.
     """
-    MainGui()
+ 
+    app = MainGui()
+
+    app.root.mainloop()
