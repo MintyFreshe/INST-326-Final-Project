@@ -28,10 +28,18 @@ import test_transactions
 
 def main():
 
-    makegui = gui.MainGui()
+    app = gui.MainGui()
 
-    entered_data = makegui.on_submit() #<-------- after button is clicked, this function is called to process the data and returns it as a dictionary
+    app.root.mainloop()
+    
+    entered_data = app.on_submit() #<-------- after button is clicked, this function is called to process the data and returns it as a dictionary
 
+    
+   
+   
+   
+    
+    
     
     #make.gui.#pie chart update method to update the pie chart with the data which has been processed by calculations
 
