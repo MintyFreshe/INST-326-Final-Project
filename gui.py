@@ -82,20 +82,6 @@ class MainGui:
         
         return info_dict #<-- Holds the data entered in the form fields
 
-    def display_data(self, data):
-        """
-        Displays the processed data in a new window or updates the existing GUI.
-
-        Args:
-            data (dict): The data to be displayed.
-        """
-        # Example implementation to display data in a new window <--------------unused window for testing purposes
-        new_window = tk.Toplevel(self.root)
-        new_window.title("Processed Data")
-        
-        for key, value in data.items():
-            label = Label(new_window, text=f"{key}: {value}")
-            label.pack(padx=5, pady=5)
 
     def on_submit(self): 
         """
