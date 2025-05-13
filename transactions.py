@@ -1,19 +1,16 @@
 import csv
 import os
 
-class TransactionManager():
+class TransactionManager:
 
     def __init__(self, csv_file="transactions.csv"):
 
         self.csv_file = csv_file
-        self.fieldnames = ["id", "transaction_name", "date", "income_expense", "amount", "essential"]
+        self.fieldnames = ['Name', 'Budget', 'Food', 'Transport', 'Housing', 'Entertainment', 'Savings', 'Miscellaneous']
 
     def load_transactions(self):
-        """Load all transactions from the CSV file
+        """Load all transactions from the CSV file."""
 
-        Returns:
-            list[dict]: A list of transactions as dictionaries
-        """
         transactions = []
         if os.path.exists(self.csv_file):
 
@@ -24,23 +21,20 @@ class TransactionManager():
 
                     try:
 
-                        row["id"] = int(row["id"])
-                        row["amount"] = float(row["amount"])
+                        for field in ['Budget', 'Food', 'Transport', 'Housing', 'Entertainment', 'Savings', 'Miscellaneous']:
+                            row[field] = float(row[field])
 
                     except ValueError:
 
-                        continue  # skips bad row
+                        continue  # skip bad rows
 
                     transactions.append(row)
 
         return transactions
 
     def save_transactions(self, data):
-        """Save a list of transaction dictionaries to the CSV file
+        """Save a list of transaction dictionaries to the CSV file."""
 
-        Args:
-            data (list[dict]): Transactions to write to file
-        """
         with open(self.csv_file, mode='w', newline='') as file:
 
             writer = csv.DictWriter(file, fieldnames=self.fieldnames)
@@ -50,97 +44,54 @@ class TransactionManager():
                 row_str = {key: str(row[key]) for key in self.fieldnames}
                 writer.writerow(row_str)
 
-    def add_transaction(self, transaction_name, date, income_expense, amount, essential):
-        """Add a new transaction to the CSV file
+    def add_transaction(self, name, budget, food, transport, housing, entertainment, savings, miscellaneous):
+        """Add a new transaction to the CSV file."""
 
-        Args:
-            transaction_name (str): Name/label for the transaction
-            date (str): Transaction date (YYYY-MM-DD)
-            income_expense (str): 'income' or 'expense'
-            amount (float): Transaction amount
-            essential (str): 'yes' or 'no'
-        """
         transactions = self.load_transactions()
-        next_id = max([t["id"] for t in transactions], default=0) + 1
-
         new_transaction = {
-            "id": next_id,
-            "transaction_name": transaction_name,
-            "date": date,
-            "income_expense": income_expense,
-            "amount": float(amount),
-            "essential": essential
+            'Name': name,
+            'Budget': float(budget),
+            'Food': float(food),
+            'Transport': float(transport),
+            'Housing': float(housing),
+            'Entertainment': float(entertainment),
+            'Savings': float(savings),
+            'Miscellaneous': float(miscellaneous)
         }
-
         transactions.append(new_transaction)
         self.save_transactions(transactions)
 
-    def get_transactions(self, start_date=None, end_date=None, category=None):
-        """Retrieve transactions filtered by date or category
+    def get_transactions(self):
+        """Return all transactions."""
 
-        Args:
-            start_date (str, optional): Earliest date to include
-            end_date (str, optional): Latest date to include
-            category (str, optional): Category (income/expense) to filter
+        return self.load_transactions()
 
-        Returns:
-            list[dict]: Matching transactions
-        """
+    def delete_transaction(self, name):
+        """Delete a transaction by name."""
+
         transactions = self.load_transactions()
-        filtered = []
-        for t in transactions:
-
-            if start_date and t["date"] < start_date:
-                continue
-
-            if end_date and t["date"] > end_date:
-                continue
-
-            if category and t["income_expense"].lower() != category.lower():
-                continue
-
-            filtered.append(t)
-
-        return filtered
-
-    def delete_transaction(self, transaction_id):
-        """Delete a transaction by ID
-
-        Args:
-            transaction_id (int): The transaction ID to delete
-        """
-        transactions = self.load_transactions()
-        updated = [t for t in transactions if t["id"] != transaction_id]
+        updated = [t for t in transactions if t["Name"] != name]
         self.save_transactions(updated)
 
-    def update_transaction(self, transaction_id, transaction_name, date, income_expense, amount, essential):
-        """Update an existing transaction by ID
+    def update_transaction(self, name, updated_data):
+        """
+        Update a transaction by name.
 
         Args:
-            transaction_id (int): ID of transaction to update
-            transaction_name (str): New transaction name
-            date (str): New date
-            income_expense (str): New type ('income' or 'expense')
-            amount (float): New amount
-            essential (str): 'yes' or 'no'
+            name (str): Name of transaction to update
+            updated_data (dict): Dictionary of updated values
         """
         transactions = self.load_transactions()
-        found = False
         for t in transactions:
 
-            if t["id"] == transaction_id:
-                t["transaction_name"] = transaction_name
-                t["date"] = date
-                t["income_expense"] = income_expense
-                t["amount"] = float(amount)
-                t["essential"] = essential
-                found = True
+            if t["Name"] == name:
+
+                for field in self.fieldnames:
+
+                    if field in updated_data:
+
+                        t[field] = updated_data[field]
+
                 break
-
-        if not found:
-
-            raise ValueError(f"Transaction with ID {transaction_id} not found.")
-        
+            
         self.save_transactions(transactions)
-
-
