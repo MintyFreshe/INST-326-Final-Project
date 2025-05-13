@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 
-def load_transactions_from_csv(filename="sample_transactions.csv"):
+def load_transactions_from_csv(filename):
     """
     Load transactions from a CSV file and return a list of dictionaries.
     Each row becomes a dictionary with string values.
@@ -198,7 +198,7 @@ def plot_stacked_expense_categories(transactions):
     
     
 if __name__ == "__main__":
-    transactions = load_transactions_from_csv()
+    transactions = load_transactions_from_csv("sample_transactions.csv")
 
     print("Total Income:", calculate_total_income(transactions))
     print("Total Expenses:", calculate_total_expenses(transactions))
