@@ -30,11 +30,37 @@ def main():
 
     app = gui.MainGui()
 
+    tm = transactions.TransactionManager()
+    
     app.root.mainloop()
+    
+    tm.load_transactions() #load csv
+    
+    #load the last transaction from the csv file and display it in the GUI
+    
     
     entered_data = app.on_submit() #<-------- after button is clicked, this function is called to process the data and returns it as a dictionary
 
     
+    tm.add_transaction(entered_data) #writes the data to the csv file
+
+    #tm.save_transactions(entered_data) #<-------- this function is called to save the data to the csv file
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    
    
    
