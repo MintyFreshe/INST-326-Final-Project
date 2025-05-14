@@ -2,11 +2,13 @@ import csv
 from collections import defaultdict
 import matplotlib.pyplot as plt
 from datetime import datetime
+import pandas as pd
+import seaborn as sns
 
 
 class Reports:
     
-    def load_transactions_from_csv(self, filename):
+    def load_transactions_from_csv(self, filename='transactions.csv'):
         """
         Load transactions from a CSV file and return a list of dictionaries.
         Each row becomes a dictionary with string values.
@@ -25,7 +27,7 @@ class Reports:
         Returns:
             float: Total income amount.
         """
-        return sum(float(t["amount"]) for t in transactions if t["income/expense"] == "income")
+        return sum(float(t["amount"]) for t in transactions if t["income_expense"] == "income")
 
     def calculate_total_expenses(self, transactions):
         """
@@ -37,7 +39,7 @@ class Reports:
         Returns:
             float: Total expense amount.
         """
-        return sum(float(t["amount"]) for t in transactions if t["income/expense"] == "expense")
+        return sum(float(t["amount"]) for t in transactions if t["income_expense"] == "expense")
 
     def calculate_balance(self, transactions):
         """
@@ -63,26 +65,29 @@ class Reports:
         """
         summary = defaultdict(lambda: {"income": 0, "expense": 0})
         for t in transactions:
-            month = t["date"][:7]
-            if t["income/expense"] == "income":
+            # Handle the space in the date column name
+            date = t["date"].strip()  # Remove any extra whitespace
+            month = date[:7]
+            if t["income_expense"] == "income":
                 summary[month]["income"] += float(t["amount"])
-            elif t["income/expense"] == "expense":
+            elif t["income_expense"] == "expense":
                 summary[month]["expense"] += float(t["amount"])
         return dict(summary)
 
     def get_category_summary(self, transactions):
         """
-        Summarize total transaction amounts by category.
+        Summarize total transaction amounts by transaction category.
 
         Args:
             transactions (list): List of transaction dictionaries.
 
         Returns:
-            dict: Dictionary of categories with summed amounts.
+            dict: Dictionary of transaction categories with summed amounts.
         """
         summary = defaultdict(float)
         for t in transactions:
-            summary[t["transaction name"]] += float(t["amount"])
+            category = t["transaction_category"].strip()
+            summary[category] += float(t["amount"])
         return dict(summary)
 
     def get_top_expenses(self, transactions, n=5):
@@ -96,7 +101,7 @@ class Reports:
         Returns:
             list: Top N expense transaction dictionaries.
         """
-        expenses = [t for t in transactions if t["income/expense"] == "expense"]
+        expenses = [t for t in transactions if t["income_expense"] == "expense"]
         return sorted(expenses, key=lambda t: float(t["amount"]), reverse=True)[:n]
 
     def export_summary_to_csv(self, summary_dict, filename="summary_report.csv"):
@@ -122,8 +127,8 @@ class Reports:
         """
         category_totals = defaultdict(float)
         for t in transactions:
-            if t["income/expense"] == "expense":
-                category_totals[t["transaction name"]] += float(t["amount"])
+            if t["income_expense"] == "expense":
+                category_totals[t["transaction_name"]] += float(t["amount"])
 
         if not category_totals:
             print("No expenses to plot.")
@@ -151,9 +156,9 @@ class Reports:
         balances = []
 
         for t in transactions_sorted:
-            if t["income/expense"] == "income":
+            if t["income_expense"] == "income":
                 balance += float(t["amount"])
-            elif t["income/expense"] == "expense":
+            elif t["income_expense"] == "expense":
                 balance -= float(t["amount"])
             dates.append(datetime.strptime(t["date"], "%Y-%m-%d"))
             balances.append(balance)
@@ -174,14 +179,12 @@ class Reports:
         Args:
             transactions (list): List of transaction dictionaries.
         """
-        import pandas as pd
-
-        expenses = [t for t in transactions if t["income/expense"] == "expense"]
+        expenses = [t for t in transactions if t["income_expense"] == "expense"]
         data = defaultdict(lambda: defaultdict(float))
 
         for t in expenses:
             month = t["date"][:7]
-            data[month][t["transaction name"]] += float(t["amount"])
+            data[month][t["transaction_name"]] += float(t["amount"])
 
         df = pd.DataFrame(data).T.fillna(0).sort_index()
 
@@ -199,7 +202,7 @@ class Reports:
 if __name__ == "__main__":
     reports = Reports()
     
-    transactions = reports.load_transactions_from_csv("sample_transactions.csv")
+    transactions = reports.load_transactions_from_csv("transactions.csv")
 
     print("Total Income:", reports.calculate_total_income(transactions))
     print("Total Expenses:", reports.calculate_total_expenses(transactions))
@@ -211,7 +214,7 @@ if __name__ == "__main__":
 
     print("\nTop Expenses:")
     for t in reports.get_top_expenses(transactions):
-        print(f"{t['date']} - {t['transaction name']} - ${t['amount']}")
+        print(f"{t['date']} - {t['transaction_name']} - ${t['amount']}")
 
     reports.plot_expense_pie(transactions)
     reports.plot_cumulative_balance(transactions)
