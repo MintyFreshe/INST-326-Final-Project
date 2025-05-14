@@ -9,8 +9,9 @@ import os
 import datetime
 
 #import required internal modules
-import gui
-import transactions
+from gui import MainGui
+from transactions import TransactionManager
+
 import reports
 
 
@@ -24,25 +25,41 @@ import test_transactions
 
 
 
-
-
-def main():
-
-    app = gui.MainGui()
-
-    tm = transactions.TransactionManager()
+class BudgetApp(MainGui):
     
-    app.root.mainloop()
+    def __init__(self):
+        super().__init__()  # Initialize GUI first
+        
+        self.transaction_manager = TransactionManager()
+        
+        #self.populate_charts_from_csv()  # Populate charts on startup
+
+
+
+
+
+
+
+
+
+
+
+
+#def main():
+
+   
     
-    tm.load_transactions() #load csv
+    #app.root.mainloop()
+    
+    #tm.load_transactions() #load csv
     
     #load the last transaction from the csv file and display it in the GUI
     
     
-    entered_data = app.on_submit() #<-------- after button is clicked, this function is called to process the data and returns it as a dictionary
+    #entered_data = app.on_submit() #<-------- after button is clicked, this function is called to process the data and returns it as a dictionary
 
     
-    tm.add_transaction(entered_data) #writes the data to the csv file
+    #tm.add_transaction(entered_data) #writes the data to the csv file
 
     #tm.save_transactions(entered_data) #<-------- this function is called to save the data to the csv file
 
@@ -91,6 +108,7 @@ def main():
 
 if __name__ == "__main__":
 
-    main()
+    app = BudgetApp()
 
-    pass
+    app.root.mainloop()
+    

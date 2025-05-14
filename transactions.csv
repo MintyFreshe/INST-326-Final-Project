@@ -1,6 +1,4 @@
-id,transaction_name, transaction_type, date,income_expense,amount,essential
-1,Groceries, Food,2025-01-01,expense,100.0,yes
-2,Salary, Income,2025-01-02,income,2000.0,no
-3,Bus Pass, Transportation,2025-01-03,expense,50.0,yes
-4,Bonus, Income,2025-01-05,income,500.0,no
-5,Coffee, Food,2025-01-06,expense,4.5,no
+id,transaction_name,transaction_category,date,income_expense,amount,essential
+1,s,Food,,expense,1111.0,no
+2,d,Food,,expense,1111.0,no
+3,111,Food,,expense,3242.0,no
