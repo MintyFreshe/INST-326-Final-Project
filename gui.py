@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import seaborn as sns
 
 class MainGui:
     """
