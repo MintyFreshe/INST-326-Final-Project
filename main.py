@@ -34,6 +34,29 @@ class BudgetApp(MainGui):
         
         self.transaction_manager.load_transactions()  # Load transactions from CSV
         
+        
+
+    
+    def on_submit(self):
+
+        self.data = super().on_submit()  # Call the parent class method to handle the GUI submission
+
+
+        # Return the entered data to be processed further
+
+
+    #def 
+
+
+
+
+
+
+
+
+
+
+
         #load the last transaction from the csv file and display it in the GUI
         
 
@@ -61,6 +84,9 @@ def main():
     app.root.mainloop()
   
     
+
+
+
     #entered_data = app.on_submit() #<-------- after button is clicked, this function is called to process the data and returns it as a dictionary
 
     
