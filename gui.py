@@ -17,7 +17,7 @@ class MainGui:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("My Budget App")
-        self.root.geometry("1200x800")
+        self.root.geometry("1400x800")
 
         # Initialize managers
         self.tm = transactions.TransactionManager()

@@ -32,29 +32,34 @@ class BudgetApp(MainGui):
         
         self.transaction_manager = TransactionManager()
         
+        self.transaction_manager.load_transactions()  # Load transactions from CSV
+        
+        #load the last transaction from the csv file and display it in the GUI
+        
+
         #self.populate_charts_from_csv()  # Populate charts on startup
 
 
-
-
-
-
-
-
-
-
-
-
-#def main():
+    
 
    
-    
-    #app.root.mainloop()
-    
-    #tm.load_transactions() #load csv
-    
-    #load the last transaction from the csv file and display it in the GUI
-    
+   #should we write methods within the program object to combine methods from the other classes?
+
+
+
+
+
+
+
+
+
+
+def main():
+
+    app = BudgetApp()
+
+    app.root.mainloop()
+  
     
     #entered_data = app.on_submit() #<-------- after button is clicked, this function is called to process the data and returns it as a dictionary
 
@@ -78,37 +83,9 @@ class BudgetApp(MainGui):
 
 
 
-   
-   
-   
-    
-    
-    
-    #make.gui.#pie chart update method to update the pie chart with the data which has been processed by calculations
-
-
-    #take info from processEntry and pass it to the transactions module
-
-
-
-    
-    #take data from entry and pass it to pie chart method in gui module
-
-
-
-
-    #retrieve data from csv file and pass it to pie chart method in gui module (get_transactions())
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
 
-    app = BudgetApp()
-
-    app.root.mainloop()
+    main()
     
