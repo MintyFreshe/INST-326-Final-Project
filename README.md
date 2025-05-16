@@ -64,6 +64,12 @@ pip install matplotlib seaborn pandas
 python main.py
 ```
 
+### 4. Run the Reports
+
+```bash
+python main.py reports
+```
+
 ---
 
 ## Example Transaction Fields
