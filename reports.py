@@ -199,23 +199,3 @@ class Reports:
 
 
 
-if __name__ == "__main__":
-    reports = Reports()
-    
-    transactions = reports.load_transactions_from_csv("transactions.csv")
-
-    print("Total Income:", reports.calculate_total_income(transactions))
-    print("Total Expenses:", reports.calculate_total_expenses(transactions))
-    print("Net Balance:", reports.calculate_balance(transactions))
-
-    print("\nMonthly Summary:")
-    for month, values in reports.get_monthly_summary(transactions).items():
-        print(f"{month}: Income = ${values['income']:.2f}, Expenses = ${values['expense']:.2f}")
-
-    print("\nTop Expenses:")
-    for t in reports.get_top_expenses(transactions):
-        print(f"{t['date']} - {t['transaction_name']} - ${t['amount']}")
-
-    reports.plot_expense_pie(transactions)
-    reports.plot_cumulative_balance(transactions)
-    reports.plot_stacked_expense_categories(transactions)

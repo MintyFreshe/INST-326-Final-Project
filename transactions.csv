@@ -2,3 +2,7 @@ id,transaction_name,transaction_category,date,income_expense,amount,essential
 1,s,Food,,expense,1111.0,no
 2,d,Food,,expense,1111.0,no
 3,111,Food,,expense,3242.0,no
+4,xx,Food,,expense,1000.0,no
+5,xyz,Transportation,,expense,500.0,no
+6,yp,Food,,expense,500.0,no
+7,5,Entertainment,,expense,2300.0,no
