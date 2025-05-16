@@ -13,7 +13,7 @@ View the repository on GitHub: [https://github.com/MintyFreshe/INST-326-Final-Pr
 ├── main.py            # Main entry point to launch the application
 ├── reports.py         # Functions for analyzing and plotting financial summaries
 ├── transactions.py    # Transaction manager to load, save, and manipulate CSV data
-├── transactions.csv   # (Generated) Data file to store transactions
+├── transactions.csv   # Data file to store transactions
 ```
 
 ---
