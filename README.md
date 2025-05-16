@@ -95,8 +95,6 @@ When adding a transaction, you will provide:
 
 ## Testing & Extending
 
-Although tests are not currently included, the structure supports:
-
 - Unit testing for "TransactionManager" methods
 - Unit testing for "Reports" methods
 - Pytest for "MainGui" methods
