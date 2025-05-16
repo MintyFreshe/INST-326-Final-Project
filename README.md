@@ -91,7 +91,7 @@ When adding a transaction, you will provide:
 
 Although tests are not currently included, the structure supports:
 
-- Unit testing for `TransactionManager` methods
+- Unit testing for "TransactionManager" methods
 - Unit testing for "Reports" methods
 - Pytest for "MainGui" methods
 
@@ -99,6 +99,6 @@ Although tests are not currently included, the structure supports:
 
 ## Notes
 
-- The application saves data to `transactions.csv` automatically.
+- The application saves data to "transactions.csv" automatically.
 - Invalid input (like non-numeric amounts) is rejected gracefully.
 - Closing the GUI exits the program cleanly.
